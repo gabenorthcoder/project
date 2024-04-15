@@ -27,18 +27,18 @@ describe("API's", () => {
     test("GET 200: Returns status code 200 for /api/topics endpoint", () => {
       return request(app).get("/api/topics").expect(200);
     });
-  });
-  test("GET 200: Should return an array of topic objects", () => {
-    return request(app)
-      .get("/api/topics")
-      .expect(200)
-      .then(({ body }) => {
-        const { topics } = body;
-        expect(topics.length).toBe(3);
-        topics.forEach((topic) => {
-          expect(typeof topic.slug).toBe("string");
-          expect(typeof topic.description).toBe("string");
+    test("GET 200: Should return an array of topic objects", () => {
+      return request(app)
+        .get("/api/topics")
+        .expect(200)
+        .then(({ body }) => {
+          const { topics } = body;
+          expect(topics.length).toBe(3);
+          topics.forEach((topic) => {
+            expect(typeof topic.slug).toBe("string");
+            expect(typeof topic.description).toBe("string");
+          });
         });
-      });
+    });
   });
 });
