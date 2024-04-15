@@ -3,6 +3,7 @@ const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index.js");
+const endPointsJson = require("../endpoints.json");
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -27,18 +28,29 @@ describe("API's", () => {
     test("GET 200: Returns status code 200 for /api/topics endpoint", () => {
       return request(app).get("/api/topics").expect(200);
     });
-  });
-  test("GET 200: Should return an array of topic objects", () => {
-    return request(app)
-      .get("/api/topics")
-      .expect(200)
-      .then(({ body }) => {
-        const { topics } = body;
-        expect(topics.length).toBe(3);
-        topics.forEach((topic) => {
-          expect(typeof topic.slug).toBe("string");
-          expect(typeof topic.description).toBe("string");
+    test("GET 200: Should return an array of topic objects", () => {
+      return request(app)
+        .get("/api/topics")
+        .expect(200)
+        .then(({ body }) => {
+          const { topics } = body;
+          expect(topics.length).toBe(3);
+          topics.forEach((topic) => {
+            expect(typeof topic.slug).toBe("string");
+            expect(typeof topic.description).toBe("string");
+          });
         });
-      });
+    });
+  });
+  describe("/api", () => {
+    test("GET 200: Returns api endpoints JSON", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+          const { endPoints } = body;
+          expect(endPoints).toMatchObject(endPointsJson);
+        });
+    });
   });
 });
