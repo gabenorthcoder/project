@@ -3,6 +3,7 @@ const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index.js");
+const endPointsJson = require("../endpoints.json");
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -38,6 +39,17 @@ describe("API's", () => {
             expect(typeof topic.slug).toBe("string");
             expect(typeof topic.description).toBe("string");
           });
+        });
+    });
+  });
+  describe("/api", () => {
+    test("GET 200: Returns api endpoints JSON", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+          const { endPoints } = body;
+          expect(endPoints).toMatchObject(endPointsJson);
         });
     });
   });
