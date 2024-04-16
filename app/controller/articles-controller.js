@@ -15,7 +15,6 @@ exports.getArticle = (req, res, next) => {
 exports.getArticles = (req, res, next) => {
   selectArticles()
     .then((articles) => {
-      console.log(typeof articles[0].created_at);
       res.status(200).send({ articles: articles });
     })
     .catch((err) => {
