@@ -8,11 +8,11 @@ const endPointsJson = require("../endpoints.json");
 beforeEach(() => seed(data));
 afterAll(() => db.end());
 describe("API's", () => {
-  // describe("/api/healthcheck", () => {
-  //   test("GET 200: returns a status code of 200", () => {
-  //     return request(app).get("/api/healthcheck").expect(200);
-  //   });
-  // });
+  describe("/api/healthcheck", () => {
+    test("GET 200: returns a status code of 200", () => {
+      return request(app).get("/api/healthcheck").expect(200);
+    });
+  });
   describe("Invalid endpoint", () => {
     test("GET 404: returns a status code of 404 for invalid endpoint", () => {
       return request(app)
