@@ -2,7 +2,11 @@ const express = require("express");
 const { checkHealth } = require("./controller/healthcheck-controller");
 const { getTopics } = require("./controller/topics-controller");
 const { getApiEndPoints } = require("./controller/api-controller");
-const { getArticle, getArticles } = require("./controller/articles-controller");
+const {
+  getArticle,
+  getArticles,
+  patchArticle,
+} = require("./controller/articles-controller");
 const {
   handleInvalidEndPoint,
   handleServerErrors,
@@ -23,6 +27,7 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticle);
 app.get("/api/articles/:article_id/comments", getComments);
 app.post("/api/articles/:article_id/comments", postComment);
+app.patch("/api/articles/:article_id", patchArticle);
 
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);

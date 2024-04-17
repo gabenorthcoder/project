@@ -1,5 +1,5 @@
 const db = require("../../db/connection.js");
-const comments = require("../../db/data/test-data/comments.js");
+
 exports.insertComment = (article_id, { username, body }) => {
   return db
     .query(

@@ -53,36 +53,83 @@ describe("API's", () => {
         });
     });
   });
+
   describe("/api/articles/:article_id", () => {
-    test("GET 200: Accepts a parametric endpoint with and article id and returns that article", () => {
-      return request(app)
-        .get("/api/articles/1")
-        .expect(200)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article).toMatchObject({
-            author: "butter_bridge",
-            title: "Living in the shadow of a great man",
-            article_id: 1,
-            body: "I find this existence challenging",
-            topic: "mitch",
-            created_at: "2020-07-09T20:11:00.000Z",
-            votes: 100,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    describe("GET Requests", () => {
+      test("GET 200: Accepts a parametric endpoint with and article id and returns that article", () => {
+        return request(app)
+          .get("/api/articles/1")
+          .expect(200)
+          .then(({ body }) => {
+            const { article } = body;
+            expect(article).toMatchObject({
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              body: "I find this existence challenging",
+              topic: "mitch",
+              created_at: "2020-07-09T20:11:00.000Z",
+              votes: 100,
+              article_img_url:
+                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            });
           });
-        });
+      });
+      test("GET 404: Responds with the appropriate error when passed the wrong article_id", () => {
+        return request(app)
+          .get("/api/articles/14")
+          .expect(404)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Not Found");
+          });
+      });
     });
-    test("GET 404: Responds with the appropriate error when passed the wrong article_id", () => {
-      return request(app)
-        .get("/api/articles/14")
-        .expect(404)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Not Found");
-        });
+    describe("PATCH Requests", () => {
+      test("PATCH 200: updates an article by article_id and return the updated article", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({ inc_votes: 10 })
+          .expect(200)
+          .then(({ body }) => {
+            const { article } = body;
+            expect(article).toMatchObject({
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              body: "I find this existence challenging",
+              topic: "mitch",
+              created_at: "2020-07-09T20:11:00.000Z",
+              votes: 110,
+              article_img_url:
+                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            });
+          });
+      });
+      test("PATCH 404: Should return an error if the article_id is  a valid datatype but does not exist", () => {
+        return request(app)
+          .patch("/api/articles/70")
+          .send({ inc_votes: 10 })
+          .expect(404)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Not Found");
+          });
+      });
+
+      test("PATCH 400: Should return an error if inc_votes is no valid datatype", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({ inc_votes: "hi" })
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Bad Request");
+          });
+      });
     });
   });
+
   describe("/api/articles", () => {
     test("GET 200: Gets all articles", () => {
       return request(app)
