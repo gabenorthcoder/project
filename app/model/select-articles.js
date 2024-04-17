@@ -39,7 +39,7 @@ exports.selectArticles = () => {
   GROUP BY articles.article_id
   ORDER BY articles.created_at DESC;`
     )
-    .then((result) => {
-      return result.rows;
+    .then(({ rows }) => {
+      return rows;
     });
 };
