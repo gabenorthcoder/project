@@ -34,8 +34,8 @@
       ]
     }
   },
-  "/api/articles/:article_id": {
-    "description": "serves an an article",
+  "GET /api/articles/:article_id": {
+    "description": "serves an object of article",
     "queries": ["article_id"],
     "exampleResponse": {
       "article": {
@@ -49,7 +49,7 @@
       }
     }
   },
-  "/api/articles/:article_id/comments": {
+  "GET /api/articles/:article_id/comments": {
     "description": "serves an array of all comments with the most recent comments first",
     "queries": ["article_id"],
     "exampleResponse": {
@@ -64,6 +64,20 @@
           "topic": "cooking"
         }
       ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "serves an object of comment ",
+    "queries": ["article_id"],
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 1,
+        "body": "Seafood substitutions are increasing",
+        "article_id": 1,
+        "author": "JohnDoe",
+        "votes": 0,
+        "created_at": "2018-05-30T15:59:13.341Z"
+      }
     }
   }
 }

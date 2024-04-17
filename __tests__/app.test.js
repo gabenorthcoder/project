@@ -127,50 +127,163 @@ describe("API's", () => {
     });
   });
   describe("/api/articles/:article_id/comments", () => {
-    test("GET 200: Sould return an array of comments for an article_id", () => {
-      return request(app)
-        .get("/api/articles/1/comments")
-        .expect(200)
-        .then(({ body }) => {
-          const { comments } = body;
-          expect(comments.length).toBe(11);
-          comments.forEach((comment) => {
-            expect(typeof comment.comment_id).toBe("number");
-            expect(typeof comment.votes).toBe("number");
-            expect(new Date(comment.created_at)).toBeInstanceOf(Date);
-            expect(typeof comment.author).toBe("string");
-            expect(typeof comment.body).toBe("string");
-            expect(typeof comment.article_id).toBe("number");
+    describe("GET Requests", () => {
+      test("GET 200: Sould return an array of comments for an article_id", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments.length).toBe(11);
+            comments.forEach((comment) => {
+              expect(typeof comment.comment_id).toBe("number");
+              expect(typeof comment.votes).toBe("number");
+              expect(new Date(comment.created_at)).toBeInstanceOf(Date);
+              expect(typeof comment.author).toBe("string");
+              expect(typeof comment.body).toBe("string");
+              expect(typeof comment.article_id).toBe("number");
+            });
           });
-        });
+      });
+      test("GET 200: Sould return an array of comments for an article_id with most recent comments first", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments.length).toBe(11);
+            expect(comments).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+      test("GET 404: Should return an error if the article_id is a valid datatype but does not exsist", () => {
+        return request(app)
+          .get("/api/articles/14/comments")
+          .expect(404)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Not Found");
+          });
+      });
+      test("GET 400: Should return an error if the article_id is no valid datatype or not included", () => {
+        return request(app)
+          .get("/api/articles/Invalid-Id/comments")
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Bad Request");
+          });
+      });
     });
-    test("GET 200: Sould return an array of comments for an article_id with most recent comments first", () => {
-      return request(app)
-        .get("/api/articles/1/comments")
-        .expect(200)
-        .then(({ body }) => {
-          const { comments } = body;
-          expect(comments.length).toBe(11);
-          expect(comments).toBeSortedBy("created_at", { descending: true });
-        });
-    });
-    test("GET 404: Should return an error if the article_id is a valid datatype but does not exsist", () => {
-      return request(app)
-        .get("/api/articles/14/comments")
-        .expect(404)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Not Found");
-        });
-    });
-    test("GET 400: Should return an error if the article_id is no valid datatype", () => {
-      return request(app)
-        .get("/api/articles/Invalid-Id/comments")
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Bad Request");
-        });
+    describe("POST Requests", () => {
+      test("POST 201: Should add a comment for an article and returned the added comment", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            username: "butter_bridge",
+            body: "Hello New Post",
+          })
+          .expect(201)
+          .then(({ body }) => {
+            const { comment } = body;
+            comment.created_at = new Date(comment.created_at);
+            expect(comment).toMatchObject(
+              expect.objectContaining({
+                comment_id: 19,
+                body: "Hello New Post",
+                article_id: 1,
+                author: "butter_bridge",
+                votes: 0,
+              })
+            );
+            expect(comment).toMatchObject({ created_at: expect.any(Date) });
+          });
+      });
+      test("POST 201: Should add a comment for an article and return the added comment even if the body an empty string", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            username: "butter_bridge",
+            body: "",
+          })
+          .expect(201)
+          .then(({ body }) => {
+            const { comment } = body;
+            comment.created_at = new Date(comment.created_at);
+            expect(comment).toMatchObject(
+              expect.objectContaining({
+                comment_id: 19,
+                body: "",
+                article_id: 1,
+                author: "butter_bridge",
+                votes: 0,
+              })
+            );
+            expect(comment).toMatchObject({ created_at: expect.any(Date) });
+          });
+      });
+      test("POST 422: Should return an error if the article_id is a valid datatype but does not exsist", () => {
+        return request(app)
+          .post("/api/articles/14/comments")
+          .send({
+            username: "butter_bridge",
+            body: "Hello New Post",
+          })
+          .expect(422)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Not Found");
+          });
+      });
+      test("POST 400: Should return an error if the article_id is not valid datatype or not included", () => {
+        return request(app)
+          .post("/api/articles/invalid-id/comments")
+          .send({
+            username: "butter_bridge",
+            body: "Hello New Post",
+          })
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Bad Request");
+          });
+      });
+      test("POST 422: Should return an error if the username is a valid data type but does not exist", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            username: "not_a_valid_username",
+            body: "Hello New Post",
+          })
+          .expect(422)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Not Found");
+          });
+      });
+      test("POST 400: Should return an error if the username not included", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            body: "Hello New Post",
+          })
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Bad Request");
+          });
+      });
+      test("POST 400: Should return an error if the body is not included", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            username: "butter_bridge",
+          })
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Bad Request");
+          });
+      });
     });
   });
 });
