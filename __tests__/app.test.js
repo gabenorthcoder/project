@@ -337,7 +337,7 @@ describe("API's", () => {
     test("DELETE 204: deletes the given comment by comment_id", () => {
       return request(app).delete("/api/comments/1").expect(204);
     });
-    test("DELETE 404: returns the approriate error if the comment_id is the valid data type but does not exist", () => {
+    test("DELETE 404: returns the appropriate error if the comment_id is the valid data type but does not exist", () => {
       return request(app)
         .delete("/api/comments/100")
         .expect(404)
@@ -345,7 +345,7 @@ describe("API's", () => {
           expect(msg).toBe("Not Found");
         });
     });
-    test("DELETE 400: returns the approriate error if the comment_id is not a valid data type", () => {
+    test("DELETE 400: returns the appropriate error if the comment_id is not a valid data type", () => {
       return request(app)
         .delete("/api/comments/invalid-id")
         .expect(400)
