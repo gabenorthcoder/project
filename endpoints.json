@@ -2,6 +2,13 @@
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
+  "GET /api/healthcheck": {
+    "description": "Serves API health status as OK",
+    "queries": [],
+    "exampleResponse": {
+      "healthcheck": "OK"
+    }
+  },
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
@@ -23,6 +30,38 @@
           "votes": 0,
           "article_img_url": "https://images.pexels.com/photos/../../.jpeg?w=700&h=700",
           "comment_count": 6
+        }
+      ]
+    }
+  },
+  "/api/articles/:article_id": {
+    "description": "serves an an article",
+    "queries": ["article_id"],
+    "exampleResponse": {
+      "article": {
+        "author": "weegembump",
+        "title": "Seafood substitutions are increasing",
+        "article_id": 1,
+        "topic": "cooking",
+        "created_at": "2018-05-30T15:59:13.341Z",
+        "votes": 0,
+        "article_img_url": "https://images.pexels.com/photos/../../.jpeg?w=700&h=700"
+      }
+    }
+  },
+  "/api/articles/:article_id/comments": {
+    "description": "serves an array of all comments with the most recent comments first",
+    "queries": ["article_id"],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 1,
+          "votes": 0,
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "author": "JohnDoe",
+          "body": "Seafood substitutions are increasing",
+          "article_id": 1,
+          "topic": "cooking"
         }
       ]
     }
