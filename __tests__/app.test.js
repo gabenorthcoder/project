@@ -374,4 +374,18 @@ describe("API's", () => {
         });
     });
   });
+  describe("/api/users", () => {
+    test("GET 200: Should return an array of all users", () => {
+      return request(app)
+        .get("/api/users")
+        .then(({ body: { users } }) => {
+          expect(users.length).toBe(4);
+          users.forEach((user) => {
+            expect(typeof user.username).toBe("string");
+            expect(typeof user.name).toBe("string");
+            expect(typeof user.avatar_url).toBe("string");
+          });
+        });
+    });
+  });
 });
