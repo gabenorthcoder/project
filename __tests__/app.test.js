@@ -353,4 +353,25 @@ describe("API's", () => {
       });
     });
   });
+  describe("/api/comments/:comment_id", () => {
+    test("DELETE 204: deletes the given comment by comment_id", () => {
+      return request(app).delete("/api/comments/1").expect(204);
+    });
+    test("DELETE 404: returns the appropriate error if the comment_id is the valid data type but does not exist", () => {
+      return request(app)
+        .delete("/api/comments/100")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not Found");
+        });
+    });
+    test("DELETE 400: returns the appropriate error if the comment_id is not a valid data type", () => {
+      return request(app)
+        .delete("/api/comments/invalid-id")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request");
+        });
+    });
+  });
 });
