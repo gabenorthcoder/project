@@ -97,5 +97,18 @@
   },
   "DELETE /api/comments/:comment_id": {
     "description": "serves a 204 status after deleting comment object"
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "johndoe",
+          "name": "John",
+          "avatar_url": "https://avatars2......../u/24394918?s=400&v=4"
+        }
+      ]
+    }
   }
 }
