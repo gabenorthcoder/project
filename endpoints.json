@@ -94,5 +94,8 @@
         "article_img_url": "https://images.pexels.com/photos/../../.jpeg?w=700&h=700"
       }
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "serves a 204 status after deleting comment object"
   }
 }
