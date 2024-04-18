@@ -194,7 +194,7 @@ describe("API's", () => {
           });
       });
     });
-    describe("GET Query Requests", () => {
+    describe("GET Query Requests /api/articles?topic=", () => {
       test("GET 200: Gets all articles by topic value <cat>", () => {
         return request(app)
           .get("/api/articles?topic=cat")
