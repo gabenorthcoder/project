@@ -151,46 +151,95 @@ describe("API's", () => {
   });
 
   describe("/api/articles", () => {
-    test("GET 200: Gets all articles", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body }) => {
-          const { articles } = body;
-          expect(articles.length).toBe(13);
-          articles.forEach((article) => {
-            expect(typeof article.author).toBe("string");
-            expect(typeof article.title).toBe("string");
-            expect(typeof article.article_id).toBe("number");
-            expect(typeof article.topic).toBe("string");
-            expect(new Date(article.created_at)).toBeInstanceOf(Date);
-            expect(typeof article.votes).toBe("number");
-            expect(typeof article.article_img_url).toBe("string");
-            expect(typeof article.comment_count).toBe("string");
+    describe("GET All Requests", () => {
+      test("GET 200: Gets all articles", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            const { articles } = body;
+            expect(articles.length).toBe(13);
+            articles.forEach((article) => {
+              expect(typeof article.author).toBe("string");
+              expect(typeof article.title).toBe("string");
+              expect(typeof article.article_id).toBe("number");
+              expect(typeof article.topic).toBe("string");
+              expect(new Date(article.created_at)).toBeInstanceOf(Date);
+              expect(typeof article.votes).toBe("number");
+              expect(typeof article.article_img_url).toBe("string");
+              expect(typeof article.comment_count).toBe("string");
+            });
           });
-        });
-    });
-    test("GET 200: The articles should be sorted by date in descending order", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body }) => {
-          const { articles } = body;
-          expect(articles.length).toBe(13);
-          expect(articles).toBeSortedBy("created_at", { descending: true });
-        });
-    });
-    test("GET 200: There should not be a body property present on any of the article objects", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body }) => {
-          const { articles } = body;
-          expect(articles.length).toBe(13);
-          articles.forEach((article) => {
-            expect(article).not.toHaveProperty("body");
+      });
+      test("GET 200: The articles should be sorted by date in descending order", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            const { articles } = body;
+            expect(articles.length).toBe(13);
+            expect(articles).toBeSortedBy("created_at", { descending: true });
           });
-        });
+      });
+      test("GET 200: There should not be a body property present on any of the article objects", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            const { articles } = body;
+            expect(articles.length).toBe(13);
+            articles.forEach((article) => {
+              expect(article).not.toHaveProperty("body");
+            });
+          });
+      });
+    });
+    describe("GET Query Requests", () => {
+      test("GET 200: Gets all articles by topic value <cat>", () => {
+        return request(app)
+          .get("/api/articles?topic=cat")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).toBe(1);
+            articles.forEach((article) => {
+              expect(typeof article.author).toBe("string");
+              expect(typeof article.title).toBe("string");
+              expect(typeof article.article_id).toBe("number");
+              expect(typeof article.topic).toBe("string");
+              expect(new Date(article.created_at)).toBeInstanceOf(Date);
+              expect(typeof article.votes).toBe("number");
+              expect(typeof article.article_img_url).toBe("string");
+              expect(typeof article.comment_count).toBe("string");
+            });
+          });
+      });
+      test("GET 200: Gets all articles by topic value <mitch> and ordered by created_at", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).toBe(12);
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+            articles.forEach((article) => {
+              expect(typeof article.author).toBe("string");
+              expect(typeof article.title).toBe("string");
+              expect(typeof article.article_id).toBe("number");
+              expect(typeof article.topic).toBe("string");
+              expect(new Date(article.created_at)).toBeInstanceOf(Date);
+              expect(typeof article.votes).toBe("number");
+              expect(typeof article.article_img_url).toBe("string");
+              expect(typeof article.comment_count).toBe("string");
+            });
+          });
+      });
+      test("GET 404: Returns the appropriate error if the query does not exist", () => {
+        return request(app)
+          .get("/api/articles?topic=wrong")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Not Found");
+          });
+      });
     });
   });
   describe("/api/articles/:article_id/comments", () => {
