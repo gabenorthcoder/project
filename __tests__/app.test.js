@@ -85,6 +85,15 @@ describe("API's", () => {
             expect(msg).toBe("Not Found");
           });
       });
+      test("GET 400: Responds with the appropriate error when passed the wrong article_id data type", () => {
+        return request(app)
+          .get("/api/articles/invalid-id")
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Bad Request");
+          });
+      });
     });
     describe("PATCH Requests", () => {
       test("PATCH 200: updates an article by article_id by increasing the vote and returning the updated article", () => {
@@ -148,6 +157,26 @@ describe("API's", () => {
             expect(msg).toBe("Bad Request");
           });
       });
+      test("PATCH 400: Should return an error if object that doesn't have an inc_votes key is sent", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({ invalid_key: 10 })
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Bad Request");
+          });
+      });
+      test("PATCH 400: Should return an error if the article_id datatype is invalid", () => {
+        return request(app)
+          .patch("/api/articles/invalid-id")
+          .send({ inc_votes: 10 })
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Bad Request");
+          });
+      });
     });
   });
 
@@ -168,7 +197,7 @@ describe("API's", () => {
               expect(new Date(article.created_at)).toBeInstanceOf(Date);
               expect(typeof article.votes).toBe("number");
               expect(typeof article.article_img_url).toBe("string");
-              expect(typeof article.comment_count).toBe("string");
+              expect(typeof article.comment_count).toBe("number");
             });
           });
       });
@@ -210,7 +239,7 @@ describe("API's", () => {
               expect(new Date(article.created_at)).toBeInstanceOf(Date);
               expect(typeof article.votes).toBe("number");
               expect(typeof article.article_img_url).toBe("string");
-              expect(typeof article.comment_count).toBe("string");
+              expect(typeof article.comment_count).toBe("number");
             });
           });
       });
@@ -229,7 +258,7 @@ describe("API's", () => {
               expect(new Date(article.created_at)).toBeInstanceOf(Date);
               expect(typeof article.votes).toBe("number");
               expect(typeof article.article_img_url).toBe("string");
-              expect(typeof article.comment_count).toBe("string");
+              expect(typeof article.comment_count).toBe("number");
             });
           });
       });
@@ -260,6 +289,16 @@ describe("API's", () => {
               expect(typeof comment.body).toBe("string");
               expect(typeof comment.article_id).toBe("number");
             });
+          });
+      });
+      test("GET 200: Sould return an empty array of comments for an article_id without comments", () => {
+        return request(app)
+          .get("/api/articles/4/comments")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments.length).toBe(0);
+            expect(comments).toEqual([]);
           });
       });
       test("GET 200: Sould return an array of comments for an article_id with most recent comments first", () => {
@@ -338,14 +377,38 @@ describe("API's", () => {
             expect(comment).toMatchObject({ created_at: expect.any(Date) });
           });
       });
-      test("POST 422: Should return an error if the article_id is a valid datatype but does not exsist", () => {
+      test("POST 201: Should add a comment for an article and return the added comment, ignoring any unnecessary body properties", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            username: "butter_bridge",
+            body: "",
+            unnecessary: "unnecessary ",
+          })
+          .expect(201)
+          .then(({ body }) => {
+            const { comment } = body;
+            comment.created_at = new Date(comment.created_at);
+            expect(comment).toMatchObject(
+              expect.objectContaining({
+                comment_id: 19,
+                body: "",
+                article_id: 1,
+                author: "butter_bridge",
+                votes: 0,
+              })
+            );
+            expect(comment).toMatchObject({ created_at: expect.any(Date) });
+          });
+      });
+      test("POST 404: Should return an error if the article_id is a valid datatype but does not exsist", () => {
         return request(app)
           .post("/api/articles/14/comments")
           .send({
             username: "butter_bridge",
             body: "Hello New Post",
           })
-          .expect(422)
+          .expect(404)
           .then(({ body }) => {
             const { msg } = body;
             expect(msg).toBe("Not Found");
@@ -364,14 +427,14 @@ describe("API's", () => {
             expect(msg).toBe("Bad Request");
           });
       });
-      test("POST 422: Should return an error if the username is a valid data type but does not exist", () => {
+      test("POST 404: Should return an error if the username is a valid data type but does not exist", () => {
         return request(app)
           .post("/api/articles/1/comments")
           .send({
             username: "not_a_valid_username",
             body: "Hello New Post",
           })
-          .expect(422)
+          .expect(404)
           .then(({ body }) => {
             const { msg } = body;
             expect(msg).toBe("Not Found");
