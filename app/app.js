@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { checkHealth } = require("./controller/healthcheck-controller");
 const { getTopics } = require("./controller/topics-controller");
 const { getApiEndPoints } = require("./controller/api-controller");
@@ -19,7 +20,9 @@ const {
   deleteComment,
 } = require("./controller/comments-controller");
 const { getUsers } = require("./controller/users-controller");
+
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.get("/api", getApiEndPoints);
